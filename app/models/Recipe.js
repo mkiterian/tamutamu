@@ -19,13 +19,18 @@ const recipeSchema = new Schema({
     ref: 'User'
   },
   imageUrl: String,
+  tags: {
+    type: [String]
+  },
   ingredients: {
     type: [String],
-    required: [true, 'Recipe must have at least one ingredient']
+    required: [true, 'Recipe must have at least one ingredient'],
+    default: undefined
   },
   directions: {
     type: [String],
-    required: [true, 'Recipe must have at least one direction']
+    required: [true, 'Recipe must have at least one direction'],
+    default: undefined
   },
   likes: {
     type: Number,
@@ -40,7 +45,10 @@ const recipeSchema = new Schema({
       type: String,
       required: [true, 'Comment body is required'],
     },
-    datePosted: Date,
+    datePosted: {
+      type: Date,
+      default: Date.now
+    },
     postedBy: String
   }]
 });
