@@ -4,14 +4,11 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const config = require('./config/config');
-require('./app/models/Recipe');
-require('./app/models/User');
+const Recipe = require('./app/models/Recipe');
+const User = require('./app/models/User');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.mongoURI);
-
-const Recipe = mongoose.model('Recipe');
-const User = mongoose.model('User');
 
 const app = express();
 app.use(cors());
@@ -46,4 +43,4 @@ app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} ...`);
 });
 
-module.exports.app = app;
+module.exports = app;
