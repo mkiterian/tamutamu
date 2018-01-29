@@ -39,11 +39,24 @@ app.post('/recipes', (req, res) => {
 
 app.get('/recipes', (req, res) => {
   Recipe.find().then(recipes => {
-    res.status(200).send({recipes});
+    res.status(200).send({ recipes });
   }).catch(err => {
     res.status(400).send(err);
   });
 });
+
+app.get('/recipes/:id', (req, res) => {
+  const { id } = req.params;
+
+  Recipe.findById(id).then(recipe => {
+    if (!recipe) {
+      return res.status(404).send({ message: 'recipe not found' });
+    }
+    res.status(200).send({ recipe });
+  }).catch(err => {
+    res.status(400).send({ message: 'Invalid id' });
+  });
+})
 
 const PORT = process.env.PORT || config.PORT;
 
