@@ -42,7 +42,7 @@ describe('POST /recipes', () => {
         }).catch(err => {
           done(err);
         });
-      })
+      });
   })
 
   it('should not create recipe with invalid data', (done) => {
@@ -61,6 +61,6 @@ describe('POST /recipes', () => {
         }).catch(err => {
           done(err);
         });
-      })
+      });
   })
 });

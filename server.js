@@ -37,6 +37,14 @@ app.post('/recipes', (req, res) => {
   });
 });
 
+app.get('/recipes', (req, res) => {
+  Recipe.find().then(recipes => {
+    res.status(200).send({recipes});
+  }).catch(err => {
+    res.status(400).send(err);
+  });
+});
+
 const PORT = process.env.PORT || config.PORT;
 
 app.listen(PORT, () => {
