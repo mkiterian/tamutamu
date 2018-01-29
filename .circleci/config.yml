@@ -15,7 +15,7 @@ jobs:
       - image: circleci/mongo:3.4.4
         environment:
         - NODE_ENV: test
-        - MONGO_URL: "mongodb://localhost:27017/Tamutamu"
+        - MONGO_URL: mongodb://localhost:27017/Tamutamu
 
     working_directory: ~/repo
 
