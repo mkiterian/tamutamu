@@ -3,3 +3,4 @@ prototype/
 node_modules/
 .nyc_output/
 prep/
+dev.js
