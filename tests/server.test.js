@@ -15,10 +15,33 @@ const testRecipe = {
   directions: ['eat', 'pray', 'love']
 }
 
+const seedRecipes = [
+  {
+    name: 'KDF',
+    description: 'If you need a description you do not deserve it',
+    imageUrl: 'http://wherepicsare.com',
+    tags: ['Breakfast', 'Snack', 'Donut'],
+    ingredients: ['wheat flour', 'water', 'no baking soda'],
+    directions: ['eat', 'pray', 'love']
+  },
+  {
+    name: 'Githeri',
+    description: 'For that good *ss sleep',
+    imageUrl: 'http://wherepicsare.com',
+    tags: ['Mama\'s', 'Dinner', 'Vegeterian'],
+    ingredients: ['maize', 'beans', 'water'],
+    directions: ['eat', 'pray', 'love']
+  }
+];
+
 beforeEach(done => {
-  Recipe.remove({}).then(() => {
-    done();
-  });
+  Recipe.remove({})
+    .then(() => {
+      return Recipe.insertMany(seedRecipes);
+    })
+    .then(() => {
+      done();
+    });
 });
 
 describe('POST /recipes', () => {
@@ -35,14 +58,14 @@ describe('POST /recipes', () => {
           return done(err);
         }
 
-        Recipe.find().then(recipes => {
+        Recipe.find({name: 'Soul Food'}).then(recipes => {
           expect(recipes.length).to.equal(1);
           expect(recipes[0].name).to.equal('Soul Food');
           done();
         }).catch(err => {
           done(err);
         });
-      })
+      });
   })
 
   it('should not create recipe with invalid data', (done) => {
@@ -56,11 +79,22 @@ describe('POST /recipes', () => {
         }
 
         Recipe.find().then(recipes => {
-          expect(recipes.length).to.equal(0);
+          expect(recipes.length).to.equal(2);
           done();
         }).catch(err => {
           done(err);
         });
-      })
+      });
   })
+});
+
+describe('GET /recipes', ()=>{
+  it('should get all recipes', (done)=>{
+    request(app)
+    .get('/recipes')
+    .expect(200)
+    .expect(res => {
+      expect(res.body.recipes.length).to.equal(2);
+    }).end(done);
+  });
 });
