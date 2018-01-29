@@ -1,12 +1,14 @@
 process.env.NODE_ENV = 'test';
 
-const { expect } = require('chai');
 const request = require('supertest');
+const { expect } = require('chai');
+const { ObjectID } = require('mongodb');
 const app = require('../server');
 
 const Recipe = require('../app/models/Recipe');
 
 const testRecipe = {
+  _id: new ObjectID(),
   name: 'Soul Food',
   description: 'I\'ve got soul but I\'m not a soldier',
   imageUrl: 'http://wherepicsare.com',
@@ -17,6 +19,7 @@ const testRecipe = {
 
 const seedRecipes = [
   {
+    _id: new ObjectID(),
     name: 'KDF',
     description: 'If you need a description you do not deserve it',
     imageUrl: 'http://wherepicsare.com',
@@ -25,6 +28,7 @@ const seedRecipes = [
     directions: ['eat', 'pray', 'love']
   },
   {
+    _id: new ObjectID(),
     name: 'Githeri',
     description: 'For that good *ss sleep',
     imageUrl: 'http://wherepicsare.com',
@@ -58,7 +62,7 @@ describe('POST /recipes', () => {
           return done(err);
         }
 
-        Recipe.find({name: 'Soul Food'}).then(recipes => {
+        Recipe.find({ name: 'Soul Food' }).then(recipes => {
           expect(recipes.length).to.equal(1);
           expect(recipes[0].name).to.equal('Soul Food');
           done();
@@ -88,13 +92,46 @@ describe('POST /recipes', () => {
   })
 });
 
-describe('GET /recipes', ()=>{
-  it('should get all recipes', (done)=>{
+describe('GET /recipes', () => {
+  it('should get all recipes', (done) => {
     request(app)
-    .get('/recipes')
-    .expect(200)
-    .expect(res => {
-      expect(res.body.recipes.length).to.equal(2);
-    }).end(done);
+      .get('/recipes')
+      .expect(200)
+      .expect(res => {
+        expect(res.body.recipes.length).to.equal(2);
+      }).end(done);
   });
 });
+
+describe('GET /recipes/:id', () => {
+  it('should return a recipe', (done) => {
+    request(app)
+      .get(`/recipes/${seedRecipes[0]._id.toHexString()}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.recipe.name).to.equal(seedRecipes[0].name);
+      })
+      .end(done);
+  });
+
+  it('should return a 404 when valid id is not found', (done) => {
+    const id = new ObjectID();
+    request(app)
+      .get(`/recipes/${id.toHexString()}`)
+      .expect(404)
+      .expect(res => {
+        expect(res.body.message).to.equal('recipe not found');
+      })
+      .end(done);
+  })
+
+  it('should return a 404 for an invalid id', (done) => {
+    request(app)
+      .get('/recipes/123456789')
+      .expect(404)
+      .expect(res => {
+        expect(res.body.message).to.equal('recipe not found');
+      })
+      .end(done);
+  })
+})

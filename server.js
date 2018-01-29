@@ -49,7 +49,7 @@ app.get('/recipes', (req, res) => {
 app.get('/recipes/:id', (req, res) => {
   const { id } = req.params;
   if (!ObjectID.isValid(id)) {
-    return res.status(400).send({ error: 'Invalid id' });
+    return res.status(404).send({ message: 'recipe not found' });
   }
 
   Recipe.findById(id).then(recipe => {
