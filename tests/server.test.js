@@ -123,7 +123,7 @@ describe('GET /recipes/:id', () => {
         expect(res.body.message).to.equal('recipe not found');
       })
       .end(done);
-  })
+  });
 
   it('should return a 404 for an invalid id', (done) => {
     request(app)
@@ -133,5 +133,5 @@ describe('GET /recipes/:id', () => {
         expect(res.body.message).to.equal('recipe not found');
       })
       .end(done);
-  })
-})
+  });
+});

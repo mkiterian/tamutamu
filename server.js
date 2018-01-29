@@ -60,7 +60,7 @@ app.get('/recipes/:id', (req, res) => {
   }).catch(err => {
     res.status(400).send();
   });
-})
+});
 
 const PORT = process.env.PORT || config.PORT;
 
