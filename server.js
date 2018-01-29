@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { ObjectID} = require('mongodb');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -47,6 +48,9 @@ app.get('/recipes', (req, res) => {
 
 app.get('/recipes/:id', (req, res) => {
   const { id } = req.params;
+  if (!ObjectID.isValid(id)) {
+    return res.status(400).send({ error: 'Invalid id' });
+  }
 
   Recipe.findById(id).then(recipe => {
     if (!recipe) {
@@ -54,7 +58,7 @@ app.get('/recipes/:id', (req, res) => {
     }
     res.status(200).send({ recipe });
   }).catch(err => {
-    res.status(400).send({ message: 'Invalid id' });
+    res.status(400).send();
   });
 })
 
