@@ -1,3 +1,5 @@
+process.env.NODE_ENV = 'test';
+
 const { expect } = require('chai');
 const request = require('supertest');
 const app = require('../server');
@@ -14,7 +16,7 @@ const testRecipe = {
 }
 
 beforeEach(done => {
-  Recipe.remove({}).then(()=>{
+  Recipe.remove({}).then(() => {
     done();
   });
 });
@@ -29,7 +31,7 @@ describe('POST /recipes', () => {
         expect(res.body).to.have.property('name', 'Soul Food');
       })
       .end((err, res) => {
-        if(err){
+        if (err) {
           return done(err);
         }
 
@@ -45,20 +47,20 @@ describe('POST /recipes', () => {
 
   it('should not create recipe with invalid data', (done) => {
     request(app)
-    .post('/recipes')
-    .send({})
-    .expect(400)
-    .end((err, res) => {
-      if(err){
-        return done(err);
-      }
+      .post('/recipes')
+      .send({})
+      .expect(400)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
 
-      Recipe.find().then(recipes => {
-        expect(recipes.length).to.equal(0);
-        done();
-      }).catch(err => {
-        done(err);
-      });
-    })
+        Recipe.find().then(recipes => {
+          expect(recipes.length).to.equal(0);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+      })
   })
 });
