@@ -168,7 +168,7 @@ describe('DELETE /recipes/:id', () => {
       expect(res.body.message).to.equal('recipe not found');
     })
     .end(done);
-  }))
+  }));
 
   it('should return a 404 when invalid id is provided', (done) => {
     request(app)
@@ -178,5 +178,5 @@ describe('DELETE /recipes/:id', () => {
       expect(res.body.message).to.equal('recipe not found');
     })
     .end(done);
-  })
+  });
 });

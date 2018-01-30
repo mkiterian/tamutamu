@@ -75,7 +75,7 @@ app.delete('/recipes/:id', (req, res) => {
     res.status(200).send({recipe});
   }).catch(err => {
     res.status(400).send();
-  })
+  });
 });
 
 const PORT = process.env.PORT || config.PORT;
