@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { ObjectID} = require('mongodb');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -39,9 +40,25 @@ app.post('/recipes', (req, res) => {
 
 app.get('/recipes', (req, res) => {
   Recipe.find().then(recipes => {
-    res.status(200).send({recipes});
+    res.status(200).send({ recipes });
   }).catch(err => {
     res.status(400).send(err);
+  });
+});
+
+app.get('/recipes/:id', (req, res) => {
+  const { id } = req.params;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({ message: 'recipe not found' });
+  }
+
+  Recipe.findById(id).then(recipe => {
+    if (!recipe) {
+      return res.status(404).send({ message: 'recipe not found' });
+    }
+    res.status(200).send({ recipe });
+  }).catch(err => {
+    res.status(400).send();
   });
 });
 
