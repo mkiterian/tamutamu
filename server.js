@@ -72,7 +72,7 @@ app.delete('/recipes/:id', (req, res) => {
       return res.status(404).send({ message: 'recipe not found' });
     }
 
-    res.status(200).send(recipe);
+    res.status(200).send({recipe});
   }).catch(err => {
     res.status(400).send();
   })
