@@ -115,9 +115,9 @@ describe('GET /recipes/:id', () => {
   });
 
   it('should return a 404 when valid id is not found', (done) => {
-    const id = new ObjectID();
+    const id = new ObjectID().toHexString();
     request(app)
-      .get(`/recipes/${id.toHexString()}`)
+      .get(`/recipes/${id}`)
       .expect(404)
       .expect(res => {
         expect(res.body.message).to.equal('recipe not found');
@@ -133,5 +133,50 @@ describe('GET /recipes/:id', () => {
         expect(res.body.message).to.equal('recipe not found');
       })
       .end(done);
+  });
+});
+
+describe('DELETE /recipes/:id', () => {
+  const id = seedRecipes[1]._id.toHexString();
+  it('should delete a recipe and return it', (done) => {
+    request(app)
+      .delete(`/recipes/${id}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.recipe.name).to.equal('Githeri');
+      })
+      .end((err, res)=>{
+        if(err){
+          return done(err);
+        }
+
+        Recipe.findById(id).then(recipe => {
+          expect(recipe).to.be.null;
+          done();
+        }).catch(err => {
+          done(err);
+        });
+      });
+  });
+
+  it('should return a 404 when id is not found', (done => {
+    const id = new ObjectID().toHexString();
+    request(app)
+    .delete(`/recipes/${id}`)
+    .expect(404)
+    .expect(res => {
+      expect(res.body.message).to.equal('recipe not found');
+    })
+    .end(done);
+  }));
+
+  it('should return a 404 when invalid id is provided', (done) => {
+    request(app)
+    .delete('/recipes/123456')
+    .expect(404)
+    .expect(res => {
+      expect(res.body.message).to.equal('recipe not found');
+    })
+    .end(done);
   });
 });

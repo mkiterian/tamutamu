@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { ObjectID} = require('mongodb');
+const { validateObjectId } = require('./utils/helpers');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
@@ -48,15 +48,31 @@ app.get('/recipes', (req, res) => {
 
 app.get('/recipes/:id', (req, res) => {
   const { id } = req.params;
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send({ message: 'recipe not found' });
-  }
+
+  validateObjectId(id, res);
 
   Recipe.findById(id).then(recipe => {
     if (!recipe) {
       return res.status(404).send({ message: 'recipe not found' });
     }
+
     res.status(200).send({ recipe });
+  }).catch(err => {
+    res.status(400).send();
+  });
+});
+
+app.delete('/recipes/:id', (req, res) => {
+  const { id } = req.params;
+
+  validateObjectId(id, res);
+
+  Recipe.findByIdAndRemove(id).then(recipe => {
+    if (!recipe) {
+      return res.status(404).send({ message: 'recipe not found' });
+    }
+
+    res.status(200).send({recipe});
   }).catch(err => {
     res.status(400).send();
   });
