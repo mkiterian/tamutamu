@@ -1,5 +1,3 @@
-process.env.NODE_ENV = 'test';
-
 const request = require('supertest');
 const { expect } = require('chai');
 const { ObjectID } = require('mongodb');
@@ -55,7 +53,7 @@ describe('POST /recipes', () => {
       .send(testRecipe)
       .expect(201)
       .expect(res => {
-        expect(res.body).to.have.property('name', 'Soul Food');
+        expect(res.body.recipe).to.have.property('name', 'Soul Food');
       })
       .end((err, res) => {
         if (err) {
@@ -136,6 +134,45 @@ describe('GET /recipes/:id', () => {
   });
 });
 
+describe('PATCH /recipes/:id', () => {
+  const id = seedRecipes[0]._id.toHexString();
+  const update = { name: 'KDF aka Ngumu' };
+
+  it('should update recipe', (done) => {
+    request(app)
+      .patch(`/recipes/${id}`)
+      .send(update)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.recipe).to.have.property('name', update.name);
+      })
+      .end((err, res) => {
+        if(err){
+          return done(err);
+        }
+        Recipe.findById(id).then(recipe => {
+          expect(recipe.name).to.equal(update.name);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+      });
+  });
+
+  it('should return a 404 when valid id is not found', (done) => {
+    const id = new ObjectID().toHexString();
+    request(app)
+      .patch(`/recipes/${id}`)
+      .send(update)
+      .expect(404)
+      .expect(res => {
+        expect(res.body.message).to.equal('recipe not found');
+      })
+      .end(done);
+  });
+
+});
+
 describe('DELETE /recipes/:id', () => {
   const id = seedRecipes[1]._id.toHexString();
   it('should delete a recipe and return it', (done) => {
@@ -145,8 +182,8 @@ describe('DELETE /recipes/:id', () => {
       .expect(res => {
         expect(res.body.recipe.name).to.equal('Githeri');
       })
-      .end((err, res)=>{
-        if(err){
+      .end((err, res) => {
+        if (err) {
           return done(err);
         }
 
@@ -162,21 +199,21 @@ describe('DELETE /recipes/:id', () => {
   it('should return a 404 when id is not found', (done => {
     const id = new ObjectID().toHexString();
     request(app)
-    .delete(`/recipes/${id}`)
-    .expect(404)
-    .expect(res => {
-      expect(res.body.message).to.equal('recipe not found');
-    })
-    .end(done);
+      .delete(`/recipes/${id}`)
+      .expect(404)
+      .expect(res => {
+        expect(res.body.message).to.equal('recipe not found');
+      })
+      .end(done);
   }));
 
   it('should return a 404 when invalid id is provided', (done) => {
     request(app)
-    .delete('/recipes/123456')
-    .expect(404)
-    .expect(res => {
-      expect(res.body.message).to.equal('recipe not found');
-    })
-    .end(done);
+      .delete('/recipes/123456')
+      .expect(404)
+      .expect(res => {
+        expect(res.body.message).to.equal('recipe not found');
+      })
+      .end(done);
   });
 });
