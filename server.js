@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { validateObjectId } = require('./utils/helpers');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const _ = require('lodash');
 
 const config = require('./config/config');
 const Recipe = require('./app/models/Recipe');
@@ -62,6 +63,27 @@ app.get('/recipes/:id', (req, res) => {
   });
 });
 
+app.patch('/recipes/:id', (req, res) => {
+  const { id } = req.params;
+  const body = _.pick(req.body, [
+    'name', 'description', 'imageUrl', 'ingredients', 'directions'
+  ]);
+
+  validateObjectId(id, res);
+
+  Recipe.findByIdAndUpdate(id, { $set: body }, { new: true })
+    .then(recipe => {
+      if (!recipe) {
+        return res.status(404).send({ message: 'recipe not found' });
+      }
+
+      res.status(200).send({ recipe });
+    })
+    .catch(err => {
+      res.status(400).send({});
+    });
+});
+
 app.delete('/recipes/:id', (req, res) => {
   const { id } = req.params;
 
@@ -72,7 +94,7 @@ app.delete('/recipes/:id', (req, res) => {
       return res.status(404).send({ message: 'recipe not found' });
     }
 
-    res.status(200).send({recipe});
+    res.status(200).send({ recipe });
   }).catch(err => {
     res.status(400).send();
   });
