@@ -16,6 +16,25 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+app.post('/users/signup', (req, res) => {
+  const { email, password, confirmPassword } = req.body;
+  if (confirmPassword !== password) {
+    return res.status(400).send({ error: 'passwords do not match' });
+  }
+  const user = User({
+    email,
+    password
+  });
+
+  user.save().then(() => {
+    return user.generateAuthToken();
+  }).then(token => {
+    res.header('x-auth', token).status(201).send({user});
+  }).catch(err => {
+    res.status(400).send(err);
+  });
+});
+
 app.post('/recipes', (req, res) => {
   const {
     name,
@@ -33,7 +52,7 @@ app.post('/recipes', (req, res) => {
   });
 
   newRecipe.save().then(recipe => {
-    res.status(201).send({recipe});
+    res.status(201).send({ recipe });
   }).catch(err => {
     res.status(400).send(err);
   });
