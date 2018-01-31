@@ -36,7 +36,7 @@ app.post('/users/signup', (req, res) => {
   });
 });
 
-app.post('/recipes', (req, res) => {
+app.post('/recipes', authenticate, (req, res) => {
   const {
     name,
     description,
