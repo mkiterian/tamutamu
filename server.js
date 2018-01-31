@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const _ = require('lodash');
 
+const authenticate = require('./middleware/authenticate');
 const config = require('./config/config');
 const Recipe = require('./app/models/Recipe');
 const User = require('./app/models/User');
@@ -29,7 +30,7 @@ app.post('/users/signup', (req, res) => {
   user.save().then(() => {
     return user.generateAuthToken();
   }).then(token => {
-    res.header('x-auth', token).status(201).send({user});
+    res.header('x-auth', token).status(201).send({ user });
   }).catch(err => {
     res.status(400).send(err);
   });
@@ -58,7 +59,7 @@ app.post('/recipes', (req, res) => {
   });
 });
 
-app.get('/recipes', (req, res) => {
+app.get('/recipes', authenticate, (req, res) => {
   Recipe.find().then(recipes => {
     res.status(200).send({ recipes });
   }).catch(err => {
@@ -66,7 +67,7 @@ app.get('/recipes', (req, res) => {
   });
 });
 
-app.get('/recipes/:id', validateRecipeId, (req, res) => {
+app.get('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
   const { id } = req.params;
 
   Recipe.findById(id).then(recipe => {
@@ -80,7 +81,7 @@ app.get('/recipes/:id', validateRecipeId, (req, res) => {
   });
 });
 
-app.patch('/recipes/:id', validateRecipeId, (req, res) => {
+app.patch('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
   const { id } = req.params;
   const body = _.pick(req.body, [
     'name', 'description', 'imageUrl', 'ingredients', 'directions'
@@ -99,7 +100,7 @@ app.patch('/recipes/:id', validateRecipeId, (req, res) => {
     });
 });
 
-app.delete('/recipes/:id', validateRecipeId, (req, res) => {
+app.delete('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
   const { id } = req.params;
 
   Recipe.findByIdAndRemove(id).then(recipe => {

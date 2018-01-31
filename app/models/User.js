@@ -35,7 +35,7 @@ const userSchema = new Schema({
   }]
 });
 
-userSchema.methods.toJSON = function(){
+userSchema.methods.toJSON = function () {
   const user = this;
   const userRep = user.toObject();
 
@@ -50,6 +50,23 @@ userSchema.methods.generateAuthToken = function () {
   user.tokens.push({ access, token });
   return user.save().then(() => {
     return token;
+  });
+}
+
+userSchema.statics.findByToken = function (token) {
+  const user = this;
+  let decoded;
+
+  try {
+    decoded = jwt.verify(token, 'asdfmovie');
+  } catch (err) {
+    return Promise.reject();
+  }
+
+  return user.findOne({
+    _id: decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
   });
 }
 
