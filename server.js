@@ -46,8 +46,15 @@ app.post('/users/login', (req, res) => {
     });
 
   }).catch(err => {
-    console.log(err);
     res.status(401).send({error: 'Wrong username or password'});
+  });
+});
+
+app.delete('/users/logout', authenticate, (req, res) => {
+  req.user.removeToken(req.token).then(()=>{
+    res.status(200).send();
+  }).catch(err => {
+    res.status(400).send();
   });
 });
 

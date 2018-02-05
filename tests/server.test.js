@@ -53,6 +53,62 @@ describe('POST /users/signup', () => {
   });
 });
 
+describe('POST /users/login', () => {
+  it('should return token when corrent credentials are provided', (done) => {
+    request(app)
+      .post('/users/login')
+      .send({
+        email: seedUsers[0].email,
+        password: seedUsers[0].password
+      }).expect(200)
+      .expect(res => {
+        expect(res.body.user).to.have.property('email', seedUsers[0].email);
+        expect(res.body.user).to.have.property('_id');
+        expect(res.header).to.have.property('x-auth');
+      }).end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
+  });
+
+  it('should not return token when incorrent credentials are provided', (done) => {
+    request(app)
+      .post('/users/login')
+      .send({
+        email: seedUsers[0].email,
+        password: 'wrongpass'
+      }).expect(401)
+      .expect(res => {
+        expect(res.header).not.to.have.property('x-auth');
+        done();
+      }).catch(err => done(err));
+  });
+});
+
+describe('DELETE /users/logout', () => {
+  it('should logout a logged in user', (done) => {
+    request(app)
+      .delete('/users/logout')
+      .set('x-auth', seedUsers[0].tokens[0].token)
+      .expect(200)
+      .expect(res => {
+        expect(res.header).not.to.have.property('x-auth');
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(seedUsers[0]._id).then(user => {
+          expect(user.tokens.length).to.equal(0);
+          done();
+        }).catch(err => done(err));
+      });
+  });
+});
+
 describe('POST /recipes', () => {
   it('should create a new recipe', (done) => {
     request(app)
