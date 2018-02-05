@@ -55,7 +55,7 @@ userSchema.methods.generateAuthToken = function () {
 }
 
 userSchema.statics.findByToken = function (token) {
-  const user = this;
+  const User = this;
   let decoded;
 
   try {
@@ -64,11 +64,33 @@ userSchema.statics.findByToken = function (token) {
     return Promise.reject();
   }
 
-  return user.findOne({
+  return User.findOne({
     _id: decoded._id,
     'tokens.token': token,
     'tokens.access': 'auth'
   });
+}
+
+userSchema.statics.findByCredentials = function (email, password) {
+  const User = this;
+
+  return User.findOne({ email }).then(user => {
+    if (!user) {
+      return Promise.reject();
+    }
+
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, match) => {
+        if (match) {
+          resolve(user);
+        } else {
+          reject();
+        }
+      });
+    });
+
+
+  })
 }
 
 userSchema.pre('save', function (next) {
@@ -77,8 +99,8 @@ userSchema.pre('save', function (next) {
   if (user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, (err, hash) => {
-         user.password = hash;
-         next();
+        user.password = hash;
+        next();
       })
     })
   } else {

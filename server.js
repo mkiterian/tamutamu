@@ -1,10 +1,11 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const { validateRecipeId } = require('./middleware/validateRecipeId');
+const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const express = require('express');
 const _ = require('lodash');
+const mongoose = require('mongoose');
 
+const { validateRecipeId } = require('./middleware/validateRecipeId');
 const authenticate = require('./middleware/authenticate');
 const config = require('./config/config');
 const Recipe = require('./app/models/Recipe');
@@ -36,6 +37,20 @@ app.post('/users/signup', (req, res) => {
   });
 });
 
+app.post('/users/login', (req, res) => {
+  const { email, password } = _.pick(req.body, ['email', 'password']);
+
+  User.findByCredentials(email, password).then(user => {
+    user.generateAuthToken().then(token => {
+      res.header('x-auth', token).status(200).send({ user });
+    });
+
+  }).catch(err => {
+    console.log(err);
+    res.status(401).send({error: 'Wrong username or password'});
+  });
+});
+
 app.post('/recipes', authenticate, (req, res) => {
   const {
     name,
@@ -59,7 +74,7 @@ app.post('/recipes', authenticate, (req, res) => {
   });
 });
 
-app.get('/recipes', authenticate, (req, res) => {
+app.get('/recipes', (req, res) => {
   Recipe.find().then(recipes => {
     res.status(200).send({ recipes });
   }).catch(err => {
@@ -67,7 +82,7 @@ app.get('/recipes', authenticate, (req, res) => {
   });
 });
 
-app.get('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
+app.get('/recipes/:id', validateRecipeId, (req, res) => {
   const { id } = req.params;
 
   Recipe.findById(id).then(recipe => {
