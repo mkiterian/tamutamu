@@ -33,7 +33,7 @@ const seedUsers = [
       token: jwt.sign({ _id: userThreeId.toHexString(), access: 'auth' }, jwtSecret).toString()
     }]
   }
-]
+];
 
 const testRecipe = {
   _id: new ObjectID(),
@@ -43,7 +43,7 @@ const testRecipe = {
   tags: ['Mama\'s', 'Dinner', 'Carnivore'],
   ingredients: ['ingredient 1', 'ingredient 2', 'ingredient 3'],
   directions: ['eat', 'pray', 'love']
-}
+};
 
 const seedRecipes = [
   {
@@ -76,7 +76,7 @@ const populateRecipes = (done) => {
     .then(() => {
       done();
     });
-}
+};
 
 const populateUsers = (done) => {
   User.remove({}).then(() => {
@@ -85,6 +85,6 @@ const populateUsers = (done) => {
 
     return Promise.all([user1, user2]);
   }).then(() => done());
-}
+};
 
 module.exports = { testRecipe, seedRecipes, seedUsers, populateUsers, populateRecipes };

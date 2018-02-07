@@ -36,7 +36,7 @@ describe('POST /users/signup', () => {
         }).catch(err => {
           done(err);
         });
-      })
+      });
   });
 
   it('should not create a user when passwords do not match', (done) => {
@@ -50,7 +50,7 @@ describe('POST /users/signup', () => {
       .expect(res => {
         expect(res.body).to.have.property('error', 'passwords do not match');
       })
-      .end(done)
+      .end(done);
   });
 });
 
@@ -143,8 +143,8 @@ describe('POST /recipes', () => {
       .expect(res => {
         expect(res.body).to.eql({});
       })
-      .end(done)
-  })
+      .end(done);
+  });
 
   it('should not create recipe with invalid data', (done) => {
     request(app)
@@ -277,8 +277,8 @@ describe('PATCH /recipes/:id', () => {
       .expect(res => {
         expect(res.body).to.eql({});
       })
-      .end(done)
-  })
+      .end(done);
+  });
 
   it('should return a 404 when valid id is not found', (done) => {
     const id = new ObjectID().toHexString();
@@ -324,7 +324,7 @@ describe('DELETE /recipes/:id', () => {
       .delete(`/recipes/${seedRecipes[1]._id.toHexString()}`)
       .set('x-auth', seedUsers[0].tokens[0].token)
       .expect(404)
-      .end(done)
+      .end(done);
   });
 
   it('should send 401 if unauthorized user tries to delete recipe', (done) => {
@@ -334,8 +334,8 @@ describe('DELETE /recipes/:id', () => {
       .expect(res => {
         expect(res.body).to.eql({});
       })
-      .end(done)
-  })
+      .end(done);
+  });
 
   it('should return a 404 when id is not found', (done => {
     const id = new ObjectID().toHexString();
