@@ -9,7 +9,7 @@ if( env === 'development') {
     process.env[key] = envConfig[key];
   });
 } else if(env === 'test'){
-  process.env.MONGO_URI = "mongodb://localhost:27017/TamutamuTest",
-  process.env.PORT = 5000,
-  process.env.JWT_SECRET = "qw7sdfh34hfsjfhw4jdf788df7d8f"
+  process.env.MONGO_URI = "mongodb://localhost:27017/TamutamuTest";
+  process.env.PORT = 5000;
+  process.env.JWT_SECRET = "qw7sdfh34hfsjfhw4jdf788df7d8f";
 }

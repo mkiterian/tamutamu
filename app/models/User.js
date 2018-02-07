@@ -43,7 +43,7 @@ userSchema.methods.toJSON = function () {
   const userRep = user.toObject();
 
   return _.pick(userRep, ['_id', 'email']);
-}
+};
 
 userSchema.methods.generateAuthToken = function () {
   const user = this;
@@ -54,7 +54,7 @@ userSchema.methods.generateAuthToken = function () {
   return user.save().then(() => {
     return token;
   });
-}
+};
 
 userSchema.methods.removeToken = function (token) {
   const user = this;
@@ -80,7 +80,7 @@ userSchema.statics.findByToken = function (token) {
     'tokens.token': token,
     'tokens.access': 'auth'
   });
-}
+};
 
 userSchema.statics.findByCredentials = function (email, password) {
   const User = this;
@@ -99,10 +99,8 @@ userSchema.statics.findByCredentials = function (email, password) {
         }
       });
     });
-
-
-  })
-}
+  });
+};
 
 userSchema.pre('save', function (next) {
   const user = this;
@@ -113,7 +111,7 @@ userSchema.pre('save', function (next) {
         user.password = hash;
         next();
       })
-    })
+    });
   } else {
     next();
   }
