@@ -5,6 +5,8 @@ const User = require('../app/models/User');
 
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
+const userThreeId = new ObjectID();
+
 
 const seedUsers = [
   {
@@ -20,6 +22,15 @@ const seedUsers = [
     _id: userTwoId,
     email: 'user2@example.com',
     password: 'simplepassword2'
+  },
+  {
+    _id: userThreeId,
+    email: 'user3@example.com',
+    password: 'simplepassword3',
+    tokens: [{
+      access: 'auth',
+      token: jwt.sign({ _id: userThreeId.toHexString(), access: 'auth' }, 'asdfmovie').toString()
+    }]
   }
 ]
 
@@ -38,6 +49,7 @@ const seedRecipes = [
     _id: new ObjectID(),
     name: 'KDF',
     description: 'If you need a description you do not deserve it',
+    _createdBy: userOneId,
     imageUrl: 'http://wherepicsare.com',
     tags: ['Breakfast', 'Snack', 'Donut'],
     ingredients: ['wheat flour', 'water', 'no baking soda'],
@@ -47,6 +59,7 @@ const seedRecipes = [
     _id: new ObjectID(),
     name: 'Githeri',
     description: 'For that good *ss sleep',
+    _createdBy: userTwoId,
     imageUrl: 'http://wherepicsare.com',
     tags: ['Mama\'s', 'Dinner', 'Vegeterian'],
     ingredients: ['maize', 'beans', 'water'],

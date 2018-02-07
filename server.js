@@ -46,12 +46,12 @@ app.post('/users/login', (req, res) => {
     });
 
   }).catch(err => {
-    res.status(401).send({error: 'Wrong username or password'});
+    res.status(401).send({ error: 'Wrong username or password' });
   });
 });
 
 app.delete('/users/logout', authenticate, (req, res) => {
-  req.user.removeToken(req.token).then(()=>{
+  req.user.removeToken(req.token).then(() => {
     res.status(200).send();
   }).catch(err => {
     res.status(400).send();
@@ -71,7 +71,8 @@ app.post('/recipes', authenticate, (req, res) => {
     description,
     imageUrl,
     ingredients,
-    directions
+    directions,
+    _createdBy: req.user._id
   });
 
   newRecipe.save().then(recipe => {
@@ -81,26 +82,30 @@ app.post('/recipes', authenticate, (req, res) => {
   });
 });
 
-app.get('/recipes', (req, res) => {
-  Recipe.find().then(recipes => {
+app.get('/recipes', authenticate, (req, res) => {
+  Recipe.find({ _createdBy: req.user._id }).then(recipes => {
     res.status(200).send({ recipes });
   }).catch(err => {
     res.status(400).send(err);
   });
 });
 
-app.get('/recipes/:id', validateRecipeId, (req, res) => {
+app.get('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
   const { id } = req.params;
 
-  Recipe.findById(id).then(recipe => {
-    if (!recipe) {
-      return res.status(404).send({ message: 'recipe not found' });
-    }
+  Recipe.findOne(
+    {
+      _id: id,
+      _createdBy: req.user._id
+    }).then(recipe => {
+      if (!recipe) {
+        return res.status(404).send({ message: 'recipe not found' });
+      }
 
-    res.status(200).send({ recipe });
-  }).catch(err => {
-    res.status(400).send();
-  });
+      res.status(200).send({ recipe });
+    }).catch(err => {
+      res.status(400).send();
+    });
 });
 
 app.patch('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
@@ -109,7 +114,10 @@ app.patch('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
     'name', 'description', 'imageUrl', 'ingredients', 'directions'
   ]);
 
-  Recipe.findByIdAndUpdate(id, { $set: body }, { new: true })
+  Recipe.findOneAndUpdate({
+    _id: id,
+    _createdBy: req.user._id
+  }, { $set: body }, { new: true })
     .then(recipe => {
       if (!recipe) {
         return res.status(404).send({ message: 'recipe not found' });
@@ -125,7 +133,10 @@ app.patch('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
 app.delete('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
   const { id } = req.params;
 
-  Recipe.findByIdAndRemove(id).then(recipe => {
+  Recipe.findOneAndRemove({
+    _id: id,
+    _createdBy: req.user._id
+  }).then(recipe => {
     if (!recipe) {
       return res.status(404).send({ message: 'recipe not found' });
     }

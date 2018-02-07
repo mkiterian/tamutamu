@@ -170,9 +170,10 @@ describe('GET /recipes', () => {
   it('should get all recipes', (done) => {
     request(app)
       .get('/recipes')
+      .set('x-auth', seedUsers[0].tokens[0].token)
       .expect(200)
       .expect(res => {
-        expect(res.body.recipes.length).to.equal(2);
+        expect(res.body.recipes.length).to.equal(1);
       }).end(done);
   });
 });
@@ -181,10 +182,19 @@ describe('GET /recipes/:id', () => {
   it('should return a recipe', (done) => {
     request(app)
       .get(`/recipes/${seedRecipes[0]._id.toHexString()}`)
+      .set('x-auth', seedUsers[0].tokens[0].token)
       .expect(200)
       .expect(res => {
         expect(res.body.recipe.name).to.equal(seedRecipes[0].name);
       })
+      .end(done);
+  });
+
+  it('should not return a recipe created by another user', (done) => {
+    request(app)
+      .get(`/recipes/${seedRecipes[1]._id.toHexString()}`)
+      .set('x-auth', seedUsers[0].tokens[0].token)
+      .expect(404)
       .end(done);
   });
 
@@ -238,6 +248,26 @@ describe('PATCH /recipes/:id', () => {
       });
   });
 
+  it('should not update another users recipe', (done) => {
+    const otherId = seedRecipes[1]._id.toHexString();
+    request(app)
+      .patch(`/recipes/${otherId}`)
+      .set('x-auth', seedUsers[0].tokens[0].token)
+      .send(update)
+      .expect(404)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        Recipe.findById(otherId).then(recipe => {
+          expect(recipe.name).to.equal(seedRecipes[1].name);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+      });
+  });
+
   it('should send 401 if unauthorized user tries to update recipe', (done) => {
     request(app)
       .patch(`/recipes/${id}`)
@@ -265,14 +295,14 @@ describe('PATCH /recipes/:id', () => {
 });
 
 describe('DELETE /recipes/:id', () => {
-  const id = seedRecipes[1]._id.toHexString();
+  const id = seedRecipes[0]._id.toHexString();
   it('should delete a recipe and return it', (done) => {
     request(app)
       .delete(`/recipes/${id}`)
       .set('x-auth', seedUsers[0].tokens[0].token)
       .expect(200)
       .expect(res => {
-        expect(res.body.recipe.name).to.equal('Githeri');
+        expect(res.body.recipe.name).to.equal('KDF');
       })
       .end((err, res) => {
         if (err) {
@@ -286,6 +316,14 @@ describe('DELETE /recipes/:id', () => {
           done(err);
         });
       });
+  });
+
+  it('should not delete another users recipe', (done) => {
+    request(app)
+      .delete(`/recipes/${seedRecipes[1]._id.toHexString()}`)
+      .set('x-auth', seedUsers[0].tokens[0].token)
+      .expect(404)
+      .end(done)
   });
 
   it('should send 401 if unauthorized user tries to delete recipe', (done) => {
