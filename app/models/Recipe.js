@@ -14,8 +14,9 @@ const recipeSchema = new Schema({
     required: [true, 'Recipe description is required'],
     minlength: 10
   },
-  _user: {
+  _createdBy: {
     type: Schema.Types.ObjectId,
+    required: true,
     ref: 'User'
   },
   imageUrl: String,
