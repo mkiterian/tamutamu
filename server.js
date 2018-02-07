@@ -12,7 +12,7 @@ const Recipe = require('./app/models/Recipe');
 const User = require('./app/models/User');
 
 mongoose.Promise = global.Promise;
-mongoose.connect(config.mongoURI);
+mongoose.connect(process.env.MONGO_URI);
 
 const app = express();
 app.use(cors());
@@ -147,7 +147,7 @@ app.delete('/recipes/:id', authenticate, validateRecipeId, (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || config.PORT;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT} ...`);

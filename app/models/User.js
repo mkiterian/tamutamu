@@ -5,6 +5,8 @@ const { Schema } = mongoose;
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
+const jwtSecret = process.env.JWT_SECRET;
+
 const userSchema = new Schema({
   email: {
     type: String,
@@ -46,7 +48,7 @@ userSchema.methods.toJSON = function () {
 userSchema.methods.generateAuthToken = function () {
   const user = this;
   const access = 'auth';
-  const token = jwt.sign({ _id: user._id.toHexString(), access }, 'asdfmovie').toString();
+  const token = jwt.sign({ _id: user._id.toHexString(), access }, jwtSecret).toString();
 
   user.tokens.push({ access, token });
   return user.save().then(() => {
@@ -68,7 +70,7 @@ userSchema.statics.findByToken = function (token) {
   let decoded;
 
   try {
-    decoded = jwt.verify(token, 'asdfmovie');
+    decoded = jwt.verify(token, jwtSecret);
   } catch (err) {
     return Promise.reject();
   }

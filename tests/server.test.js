@@ -1,6 +1,7 @@
 const request = require('supertest');
 const { expect } = require('chai');
 const { ObjectID } = require('mongodb');
+const config = require('../config/config');
 const { testRecipe, seedRecipes, seedUsers, populateUsers, populateRecipes } = require('./seed');
 
 const app = require('../server');

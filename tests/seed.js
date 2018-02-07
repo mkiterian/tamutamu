@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Recipe = require('../app/models/Recipe');
 const User = require('../app/models/User');
 
+const jwtSecret = process.env.JWT_SECRET;
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
 const userThreeId = new ObjectID();
@@ -15,7 +16,7 @@ const seedUsers = [
     password: 'simplepassword1',
     tokens: [{
       access: 'auth',
-      token: jwt.sign({ _id: userOneId.toHexString(), access: 'auth' }, 'asdfmovie').toString()
+      token: jwt.sign({ _id: userOneId.toHexString(), access: 'auth' }, jwtSecret).toString()
     }]
   },
   {
@@ -29,7 +30,7 @@ const seedUsers = [
     password: 'simplepassword3',
     tokens: [{
       access: 'auth',
-      token: jwt.sign({ _id: userThreeId.toHexString(), access: 'auth' }, 'asdfmovie').toString()
+      token: jwt.sign({ _id: userThreeId.toHexString(), access: 'auth' }, jwtSecret).toString()
     }]
   }
 ]
